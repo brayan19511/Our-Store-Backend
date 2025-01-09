@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model almacen {
+  id_almacen         Int               @id(map: "PK__almacen__098D5D130D8A8517") @default(autoincrement())
+  cod_almacen        String?           @db.NVarChar(3)
+  descripcion        String?           @db.NVarChar(30)
+  direccion          String?           @db.NVarChar(200)
+  fecha_creacion     DateTime?         @default(now(), map: "DF__almacen__fecha_c__4BAC3F29") @db.DateTime
+  fecha_modificacion DateTime?         @db.DateTime
+  activo             Boolean?          @default(true, map: "DF__almacen__activo__4D94879B")
+  almacen_detalle    almacen_detalle[]
+}
+
+model almacen_detalle {
+  id_almacen  Int
+  id_producto Int
+  descripcion String?  @db.NVarChar(200)
+  stock       Int?     @default(0, map: "DF__almacen_d__stock__5070F446")
+  almacen     almacen  @relation(fields: [id_almacen], references: [id_almacen], onUpdate: NoAction, map: "fk_almacen")
+  producto    producto @relation(fields: [id_producto], references: [id_producto], onUpdate: NoAction, map: "fk_producto")
+
+  @@id([id_almacen, id_producto], map: "PK__almacen___C67E1CD366D60913")
+}
+
+model cliente {
+  id_cliente         Int           @id(map: "PK__cliente__677F38F548157095") @default(autoincrement())
+  rut                String        @unique(map: "UQ__cliente__C2B74E769CE2B5B4") @db.NVarChar(12)
+  nombres            String        @db.NVarChar(50)
+  apellidos          String        @db.NVarChar(50)
+  correo             String        @db.NVarChar(100)
+  telefono           String?       @db.VarChar(20)
+  id_tipo_cliente    Int?
+  fecha_creacion     DateTime?     @default(now(), map: "DF__cliente__fecha_c__5812160E") @db.DateTime
+  fecha_modificacion DateTime?     @db.DateTime
+  activo             Boolean?      @default(true, map: "DF__cliente__activo__59FA5E80")
+  tipo_cliente       tipo_cliente? @relation(fields: [id_tipo_cliente], references: [id_tipo_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_cliente")
+  venta              venta[]
+}
+
+model marca {
+  id_marca           Int        @id(map: "PK__marca__7E43E99EE018E358") @default(autoincrement())
+  cod_marca          String     @unique(map: "UQ__marca__BD29DD91E5434E72") @db.VarChar(5)
+  fecha_creacion     DateTime?  @default(now(), map: "DF__marca__fecha_cre__3E52440B") @db.DateTime
+  fecha_modificacion DateTime?  @db.DateTime
+  activo             Boolean?   @default(true, map: "DF__marca__activo__403A8C7D")
+  descripcion        String     @db.NVarChar(30)
+  producto           producto[]
+}
+
+model producto {
+  id_producto        Int               @id(map: "PK__producto__FF341C0D8D993F16") @default(autoincrement())
+  codigo             String            @unique(map: "UQ__producto__40F9A206563D541E") @db.VarChar(10)
+  descripcion        String            @db.NVarChar(200)
+  precio             Decimal?          @db.Decimal(10, 2)
+  fecha_creacion     DateTime?         @default(now(), map: "DF__producto__fecha___44FF419A") @db.DateTime
+  fecha_modificacion DateTime?         @db.DateTime
+  activo             Boolean?          @default(true, map: "DF__producto__activo__46E78A0C")
+  id_rubro           Int?
+  id_marca           Int?
+  almacen_detalle    almacen_detalle[]
+  marca              marca?            @relation(fields: [id_marca], references: [id_marca], onDelete: NoAction, onUpdate: NoAction, map: "fk_marca")
+  rubro              rubro?            @relation(fields: [id_rubro], references: [id_rubro], onDelete: NoAction, onUpdate: NoAction, map: "fk_rubro")
+}
+
+model rubro {
+  id_rubro           Int        @id(map: "PK__rubro__E7379B038CF18C23") @default(autoincrement())
+  cod_rubro          String     @unique(map: "UQ__rubro__70D0A4EAE20454C4") @db.VarChar(5)
+  descripcion        String     @db.NVarChar(30)
+  fecha_creacion     DateTime?  @default(now(), map: "DF__rubro__fecha_cre__38996AB5") @db.DateTime
+  fecha_modificacion DateTime?  @db.DateTime
+  activo             Boolean?   @default(true, map: "DF__rubro__activo__3A81B327")
+  producto           producto[]
+}
+
+model tipo_cliente {
+  id_tipo_cliente Int       @id(map: "PK__tipo_cli__69D671C5B45F48C1") @default(autoincrement())
+  descripcion     String?   @db.VarChar(50)
+  cliente         cliente[]
+}
+
+model tipo_documento {
+  id_documento Int     @id(map: "PK__tipo_doc__5D2EE7E503A592B8") @default(autoincrement())
+  descripcion  String? @db.VarChar(100)
+  venta        venta[]
+}
+
+model venta {
+  numSerie           String          @db.VarChar(4)
+  numFolio           Int             @default(autoincrement())
+  id_cliente         Int?
+  id_documento       Int?
+  fecha_creacion     DateTime?       @default(now(), map: "DF__venta__fecha_cre__5FB337D6") @db.DateTime
+  fecha_modificacion DateTime?       @db.DateTime
+  activo             Boolean?        @default(true, map: "DF__venta__activo__619B8048")
+  cliente            cliente?        @relation(fields: [id_cliente], references: [id_cliente], onDelete: NoAction, onUpdate: NoAction, map: "fk_cliente")
+  tipo_documento     tipo_documento? @relation(fields: [id_documento], references: [id_documento], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_documento")
+  venta_detalle      venta_detalle[]
+
+  @@id([numSerie, numFolio], map: "PK__venta__EFFA7C8478CCC3CE")
+}
+
+model venta_detalle {
+  numSerie  String   @db.VarChar(4)
+  numFolio  Int
+  linea     Int
+  cantidad  Int
+  precio    Decimal? @db.Decimal(20, 2)
+  descuento Decimal? @db.Decimal(20, 2)
+  iva       Decimal? @db.Decimal(20, 2)
+  venta     venta    @relation(fields: [numSerie, numFolio], references: [numSerie, numFolio], onUpdate: NoAction, map: "fk_venta")
+
+  @@id([numSerie, numFolio, linea], map: "PK__venta_de__C7E6CEB5C3F7A0BF")
+}
