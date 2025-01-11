@@ -17,18 +17,18 @@ export class RubroController {
     return this.rubroService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rubroService.findOne(+id);
+  @Get(':rubro')
+  findOne(@Param('rubro') rubro: string) {
+    return this.rubroService.findOne(rubro);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRubroDto: UpdateRubroDto) {
-    return this.rubroService.update(+id, updateRubroDto);
+  @Patch(':rubro')
+  update(@Param('rubro') rubro: string, @Body() updateRubroDto: UpdateRubroDto) {
+    return this.rubroService.update(rubro, updateRubroDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rubroService.remove(+id);
+  @Delete(':rubro')
+  remove(@Param('rubro') rubro: string) {
+    return this.rubroService.remove(rubro);
   }
 }

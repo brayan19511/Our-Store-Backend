@@ -17,18 +17,18 @@ export class MarcaController {
     return this.marcaService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.marcaService.findOne(+id);
+  @Get(':marca')
+  findOne(@Param('marca') marca: string) {
+    return this.marcaService.findOne(marca);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMarcaDto: UpdateMarcaDto) {
-    return this.marcaService.update(+id, updateMarcaDto);
+  @Patch(':marca')
+  update(@Param('marca') marca: string, @Body() updateMarcaDto: UpdateMarcaDto) {
+    return this.marcaService.update(marca, updateMarcaDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.marcaService.remove(+id);
+  @Delete(':marca')
+  remove(@Param('marca') marca: string) {
+    return this.marcaService.remove(marca);
   }
 }
